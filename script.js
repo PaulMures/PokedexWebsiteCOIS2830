@@ -80,6 +80,156 @@ const updateDisplay = () => {
     });
 };
 
+//Quiz Variables
+var myQuestions = [
+	{
+		question: "What is pokemon #049?",
+		answers: {
+			a: 'Victreebel',
+			b: 'Venomoth',
+			c: 'Voltorb'
+		},
+		correctAnswer: 'b'
+	},
+	{
+		question: "Which of these is a ground type?",
+		answers: {
+			a: 'Omanyte',
+			b: 'Grimer',
+			c: 'Sandshrew'
+		},
+		correctAnswer: 'c'
+	},
+	{
+		question: "Which of these comes from a fossil?",
+		answers: {
+			a: 'Kabuto',
+			b: 'Kabutops',
+			c: 'Golem'
+		},
+		correctAnswer: 'a'
+	},
+	{
+		question: "What is the 151st Pokemon?",
+		answers: {
+			a: 'Pikachu',
+			b: 'MewTwo',
+			c: 'Mew'
+		},
+		correctAnswer: 'c'
+	}
+]; //Questions
+
+var quizContainer = document.getElementById('Quiz');
+var resultsContainer = document.getElementById('results');
+var submitButton = document.getElementById('submit');
+
+//Confetti Code
+const canvas = document.querySelector('#confetti') //canvas
+const jsConfetti = new JSConfetti()
+
+//Quiz function
+function generateQuiz(questions, quizContainer, resultsContainer, submitButton){
+
+	function showQuestions(questions, quizContainer){
+
+        //Variables
+        var output = [];
+        var answers;
+    
+        //For each question
+        for(var i=0; i<questions.length; i++){
+            
+            answers = [];
+    
+            //For each letter
+            for(letter in questions[i].answers){
+    
+                //Push answers
+                answers.push(
+                    '<label>'
+                        + '<input type="radio" name="question'+i+'" value="'+letter+'">'
+                        + letter + ': '
+                        + questions[i].answers[letter]
+                    + '</label>'
+                );
+            }
+    
+            output.push(
+                '<div class="question">' + questions[i].question + '</div>'
+                + '<div class="answers">' + answers.join('') + '</div>'
+            );
+        }
+    
+        quizContainer.innerHTML = output.join('');
+    }
+
+	function showResults(questions, quizContainer, resultsContainer){
+	
+        //Collect Answer Containers
+        var answerContainers = quizContainer.querySelectorAll('.answers');
+        
+        //Store answers
+        var userAnswer = '';
+        var numCorrect = 0;
+        var faceScore = '';
+        
+        //For each question
+        for(var i=0; i<questions.length; i++){
+    
+            //Find answer
+            userAnswer = (answerContainers[i].querySelector('input[name=question'+i+']:checked')||{}).value;
+            
+            //If Correct
+            if(userAnswer===questions[i].correctAnswer){
+
+                //Counter
+                numCorrect++;
+                
+                //Colour green
+                answerContainers[i].style.color = 'lightgreen';
+            }
+            else{
+                // color the answers red
+                answerContainers[i].style.color = 'red';
+            }
+        }
+
+        //Face reaction
+        if (numCorrect < 2){
+            faceScore = ' :('
+        }
+        else if (numCorrect < 4){
+            faceScore = ' :)'
+        }
+        else if (numCorrect == 4){
+            faceScore = ' :D'
+        }
+
+        //Confetti
+        if (numCorrect >= 2){
+            jsConfetti.addConfetti({
+                confettiRadius: 6,
+                confettiNumber: 500,
+                confettiColors: ['#0000FF', '#FF0000', '#FFFF00', '#00FF00', '#800080', '#FFC0CB',]
+            })
+        }
+    
+        //Show total
+        resultsContainer.innerHTML = numCorrect + ' out of ' + questions.length + faceScore;
+    }
+
+	//Show Questions
+	showQuestions(questions, quizContainer);
+
+	//When click, show results
+	submitButton.onclick = function(){
+		showResults(questions, quizContainer, resultsContainer);
+	}
+}
+
+generateQuiz(myQuestions, quizContainer, resultsContainer, submitButton);
+
 // Event Listeners
 searchInput.addEventListener("input", updateDisplay);
 filterSelect.addEventListener("change", updateDisplay);
